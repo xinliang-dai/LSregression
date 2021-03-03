@@ -19,10 +19,10 @@ classdef nlsProblem
             obj.check_bound_dim;
             % switch from different methods
             switch obj.options.method
-                case {'internal solver'}
+                case {'internal'}
                     [xsol,~,~,flag] = lsqnonlin(obj.f, obj.x0);
                     logg            = nan;
-                case {'classic gauss-newton'}
+                case {'class gauss-newton'}
                     [xsol,flag,logg] = basic_gauss_newton(obj);
                     logg = logg.post_dataprocessing;
             end                
@@ -44,4 +44,6 @@ classdef nlsProblem
         end
     end
 end
+
+% function [f,df]
 

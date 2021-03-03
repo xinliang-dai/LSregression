@@ -3,24 +3,29 @@ classdef nlsOption
     %   Detailed explanation goes here
     
     properties
-        iter_max (1,1) int8   {mustBePositive} = 50;
-        tol      (1,1) double {mustBePositive} = 10^(-3);
-        method         char = 'classic gauss-newton'
-        solver         char = 'internal'  
+        iter_max  int8   {mustBePositive} 
+        tol       double {mustBePositive} 
+        method         char 
+        solver         char  
     end
     
     methods
         % constructor
         function obj = nlsOption(iter_max,tol,method,solver)
-            if nargin>4
-                obj.solver   = solver;
-            elseif nargin>3
-                obj.method   = method;
-            elseif nargin>2
-                obj.tol      = tol;
-            elseif nargin>1
+            
+            if nargin > 0
                 obj.iter_max = iter_max;
-            end          
+                if nargin > 1
+                    obj.tol      = tol;
+                    if nargin >2
+                        obj.method   = method;
+                        if nargin > 3
+                             obj.solver   = solver;
+                        end
+                    end
+                end
+            end
+
         end
         
 %         function outputArg = method1(obj,inputArg)

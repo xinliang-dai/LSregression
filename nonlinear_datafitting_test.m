@@ -1,25 +1,20 @@
 %% create data 
-d = linspace(0,3)';
-y = exp(-1.3*d) + 0.05*randn(size(d));
-% y = 1.3*d + 0.05*randn(size(d));
+% [d,y,f,dfdx,x0] = dim_1_case;
+[d,y,f,dfdx,x0] = dim_2_case;
 %% initial obj
 test      = nlsProblem;
-test.x0   = 5;
-test.f    =  @(r)exp(-d*r)-y;
-test.dfdx =  @(r)-exp(-d*r);
-
-tol       = 10^(-3);
+test.x0   = x0;
+test.f    = f;
+test.dfdx = dfdx;
+% setting options for solving nls problem
+tol       = 10^(-10);
 iter_max  = 40;
-test.options = nlsOption(iter_max,tol,'classic gauss-newton');
-% test.f = @(x) (d*x-y);
-% test.dfdx =  @(x) d;
+test.options = nlsOption(iter_max,tol,'class gauss-newton');
 %% run internal nls solver
-% xsol = test.internal_solver
-% [xsol_gn,flag, logg] = basic_gauss_newton(test);
 [xsol_gn, logg, flag] = test.solve_nls;
-% post date-processing
+xsol_gn
 %% plot result
-plot(d,y,'ko',d,d*xsol_gn,'b-')
+plot(d,y,'ko',d,test.f(xsol_gn)+y,'b-')
 legend('Data','Best fit')
 xlabel('t')
 ylabel('exp(-tx)')
