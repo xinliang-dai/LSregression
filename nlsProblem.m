@@ -25,6 +25,9 @@ classdef nlsProblem
                 case {'class gauss-newton'}
                     [xsol,flag,logg] = basic_gauss_newton(obj);
                     logg = logg.post_dataprocessing;
+                case ('pcg gauss-newton')
+                    [xsol,flag,logg] = pcg_gauss_newton(obj);
+                    logg = logg.post_dataprocessing;                    
             end                
         end      
         

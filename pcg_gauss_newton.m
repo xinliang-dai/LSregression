@@ -1,4 +1,5 @@
-function [xsol, flag, logg] = basic_gauss_newton(problem)
+function [xsol, flag, logg] = pcg_gauss_newton(problem)
+    % gauss-newton method with precondition conjugate gradient
     % intial
     if isempty(problem.options)
         problem.options = nlsProblem;
@@ -8,7 +9,7 @@ function [xsol, flag, logg] = basic_gauss_newton(problem)
     end
     x0       = problem.x0;
     Nx       = numel(x0);
-
+    Nr       = numel(problem.f(x0));
     % create logg from interInfo class
     logg = iterInfo(iter_max, Nx); 
     
@@ -20,7 +21,8 @@ function [xsol, flag, logg] = basic_gauss_newton(problem)
     i =1;
     while i<iter_max && ~flag 
         % gauss-newton step
-        p  = - (df'*f)/(df'*df);
+%         p  = - (df'*f)/(df'*df);
+        [p,~,~,~] = pcgsh(@problem.f,f);
         % relative steplength
         rel_steplength = norm(p)/norm(x0);
         if isnan(rel_steplength), rel_steplength = 0; end
