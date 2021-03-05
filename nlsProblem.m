@@ -3,9 +3,9 @@ classdef nlsProblem
     %   the nonlinear least squares objective function F(x) := 0.5*(f(x)'*f(x)).
     properties
         % residual
-        f 
-        % jacobian
-        dfdx 
+        r 
+        % jacobian matrix - first derivative of residual
+        drdx 
         % initial point
         x0         double    {mustBeNumeric}
         %
@@ -20,15 +20,17 @@ classdef nlsProblem
             % switch from different methods
             switch obj.options.method
                 case {'internal'}
-                    [xsol,~,~,flag] = lsqnonlin(obj.f, obj.x0);
+                    [xsol,~,~,flag] = lsqnonlin(obj.r, obj.x0);
                     logg            = nan;
                 case {'class gauss-newton'}
                     [xsol,flag,logg] = basic_gauss_newton(obj);
                     logg = logg.post_dataprocessing;
-                case ('pcg gauss-newton')
+                case ('CG gauss-newton')
+                    [xsol,flag,logg] = cg_gauss_newton(obj);
+                    logg = logg.post_dataprocessing;  
+                case ('PCG gauss-newton')
                     [xsol,flag,logg] = pcg_gauss_newton(obj);
-                    logg = logg.post_dataprocessing;                    
-            end                
+                    logg = logg.post_dataprocessing;              end                
         end      
         
         % check the dimension of lower and upper bounds

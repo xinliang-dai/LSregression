@@ -13,23 +13,29 @@ function [xsol, flag, logg] = basic_gauss_newton(problem)
     logg = iterInfo(iter_max, Nx); 
     
     % start Gauss-Newton method
-    df = problem.dfdx(x0);
-    f  = problem.f(x0);
-    df_val = norm(df);
+    r      = problem.r;          % residual fucntion
+    Jk     = problem.drdx;       % jacobian function
+    r_val  = r(x0);              % initial residual
+    Jk_val = Jk(x0);             % initial jacobian matrix
+    Jk_norm = norm(Jk_val,2);
+    B      = @(x) (Jk(x))'*Jk(x);% approximation of Hessian
     flag  = false;
     i =1;
     while i<iter_max && ~flag 
+        B_mat = B(x0);
         % gauss-newton step
-        p  = - (df'*f)/(df'*df);
+        p  = - B_mat\ (Jk_val'*r_val);
+        % gauss-newton step by conjugate gradient
+%         p     = conjugate_gradient(B_mat,);
         % relative steplength
         rel_steplength = norm(p)/norm(x0);
         if isnan(rel_steplength), rel_steplength = 0; end
-        df = problem.dfdx(x0+p);
-        f  = problem.f(x0+p);
-        f_val      = norm(f,inf);        
-        df_val_new = norm(df,inf);
-        rho        = (df_val_new - df_val)/df_val;
-        df_val     = df_val_new;
+        Jk_val     = Jk(x0+p);
+        r_val      = problem.r(x0+p);
+        cost       = norm(r_val,2);        
+        Jk_norm_new   = norm(Jk_val, 2);
+        rho        = (Jk_norm_new - Jk_norm)/Jk_norm;
+        Jk_norm     = Jk_norm_new;
 %         norm(dfval)
         x0 = x0+p;
         
@@ -40,8 +46,8 @@ function [xsol, flag, logg] = basic_gauss_newton(problem)
         % recording in current iteration
         logg.xk(:,i)           = x0;
         logg.iter(i)           = i;
-        logg.fval(i)           = f_val;
-        logg.dfval(i)          = df_val;
+        logg.fval(i)           = cost;
+        logg.dfval(i)          = Jk_norm;
         logg.rel_steplength(i) = rel_steplength;
         i = i + 1;
     end

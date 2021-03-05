@@ -1,4 +1,4 @@
-function x0 = vary_initial_point(x_sol,radiu,sigma)
+function x0 = vary_initial_point(x_sol,sigma)
     
     Nx            =  numel(x_sol);
 %     random_vector =  (2*rand(Nx,1)-1)*radiu;
