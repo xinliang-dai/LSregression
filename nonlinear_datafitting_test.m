@@ -1,9 +1,9 @@
 %% add path
 addpath(genpath('../ClassDef/'));
 %% create data 
-% [d,y,r,drdx,x0,xval] = dim_1_case;
-[d,y,r,drdx,x0,xval] = dim_2_case;
-% [d,y,r,drdx,x0,xval] = dim_2_linear_case;
+[d,y,r,drdx,x0,xval] = dim_1_case;
+% [d,y,r,drdx,x0,xval] = dim_2_case;
+% [d,y,r,drdx,x0,xval] = dim_2_quadratic_case;
 %% initial obj
 test      = nlsProblem;
 test.x0   = x0;
