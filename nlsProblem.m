@@ -30,7 +30,11 @@ classdef nlsProblem
                     logg = logg.post_dataprocessing;  
                 case ('PCG gauss-newton')
                     [xsol,flag,logg] = pcg_gauss_newton(obj);
-                    logg = logg.post_dataprocessing;              end                
+                    logg = logg.post_dataprocessing;   
+                case ('CG-Steihaug gauss-newton')
+                    [xsol,flag,logg] = cg_steihaug_gauss_newton(obj);
+                    logg = logg.post_dataprocessing;                       
+            end                
         end      
         
         % check the dimension of lower and upper bounds

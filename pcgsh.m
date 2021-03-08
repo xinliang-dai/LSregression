@@ -26,7 +26,7 @@ flag = 1;
 for iter = 1:maxit
 
     if isnumeric(A), Ad = A*d;
-    else Ad = A(d); end
+    else Ad = A(d)*d; end
     alpha = rr/(d'*Ad);
 
     x1 = x;

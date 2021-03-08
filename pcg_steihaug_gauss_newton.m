@@ -1,5 +1,5 @@
-function [xsol, flag, logg] = cg_gauss_newton(problem)
-    % Gauss-Newtond with standard conjugate gradient 
+function [xsol, flag, logg] = pcg_steihaug_gauss_newton(problem)
+    % Gauss-Newtond with preconditioned conjugate gradient 
     % intial
     if isempty(problem.options)
         problem.options = nlsProblem;
@@ -23,11 +23,16 @@ function [xsol, flag, logg] = cg_gauss_newton(problem)
     flag  = false;
     i =1;
     while i<iter_max && ~flag 
-        B_mat = B(x0);
+        B_mat_sparse = sparse(B(x0));
         % gauss-newton step
-        p_class  = - B_mat\ (Jk_val'*r_val);
+        p_class  = - B_mat_sparse\ (Jk_val'*r_val);
         % gauss-newton step by conjugate gradient
-        p     = line_search_cg(B_mat,-Jk_val'*r_val,tol,iter_max);
+%         p_gn     = conjugate_gradient(B_mat_sparse,-Jk_val'*r_val,tol,iter_max);
+        % preconditioned gauss-newton step - sparse form ichol(B_mat)
+        C_T      = ichol(B_mat_sparse);
+%       
+        p        = preconditioned_cg_steihaug(B_mat_sparse,-Jk_val'*r_val,tol,iter_max,C_T);
+        
         % relative steplength
         rel_steplength = norm(p,2)/norm(x0,2);
         if isnan(rel_steplength), rel_steplength = 0; end

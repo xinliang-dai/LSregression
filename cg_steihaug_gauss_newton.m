@@ -1,4 +1,4 @@
-function [xsol, flag, logg] = cg_gauss_newton(problem)
+function [xsol, flag, logg] = cg_steihaug_gauss_newton(problem)
     % Gauss-Newtond with standard conjugate gradient 
     % intial
     if isempty(problem.options)
@@ -27,7 +27,9 @@ function [xsol, flag, logg] = cg_gauss_newton(problem)
         % gauss-newton step
         p_class  = - B_mat\ (Jk_val'*r_val);
         % gauss-newton step by conjugate gradient
-        p     = line_search_cg(B_mat,-Jk_val'*r_val,tol,iter_max);
+        p     = cg_steihaug(B_mat,-Jk_val'*r_val,tol,iter_max,delta);
+        % updating radius of trust-region
+        
         % relative steplength
         rel_steplength = norm(p,2)/norm(x0,2);
         if isnan(rel_steplength), rel_steplength = 0; end
@@ -36,7 +38,7 @@ function [xsol, flag, logg] = cg_gauss_newton(problem)
         cost       = norm(r_val,2)/2;        
         Jk_norm_new   = norm(Jk_val, 2);
         rho        = (Jk_norm_new - Jk_norm)/Jk_norm;
-        Jk_norm     = Jk_norm_new;
+        Jk_norm    = Jk_norm_new;
 %         norm(dfval)
         x0 = x0+p;
         
