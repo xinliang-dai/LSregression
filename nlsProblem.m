@@ -33,7 +33,6 @@ classdef nlsProblem
                     logg = logg.post_dataprocessing;   
                 case ('CG-Steihaug gauss-newton')
                     [xsol,flag,logg] = cg_steihaug_gauss_newton(obj);
-                    logg = logg.post_dataprocessing;                       
             end                
         end      
         

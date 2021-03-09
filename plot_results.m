@@ -27,7 +27,7 @@ ylabel('$\nabla f(x^k)$','fontsize',12,'interpreter','latex')
 grid on 
 
 subplot(2,2,4)
-semilogy(logg.iter, logg.rel_steplength)
+semilogy(logg.iter, logg.pk_norm)
 xlabel('$\mathrm{Iteration}$','fontsize',12,'interpreter','latex')
 ylabel('$\frac{||p||_2}{||x^k||_2}$','fontsize',12,'interpreter','latex')
 
