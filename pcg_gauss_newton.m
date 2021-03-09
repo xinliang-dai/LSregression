@@ -31,7 +31,7 @@ function [xsol, flag, logg] = pcg_gauss_newton(problem)
         % preconditioned gauss-newton step - sparse form ichol(B_mat)
         C_T      = ichol(B_mat_sparse);
 %       
-        p        = preconditioned_cg(B_mat_sparse,-Jk_val'*r_val,tol,iter_max,C_T);
+        p        = preconditioned_cg(B_mat_sparse,-Jk_val'*r_val,tol,iter_max,C_T)
         
         % relative steplength
         rel_steplength = norm(p,2)/norm(x0,2);
@@ -41,7 +41,7 @@ function [xsol, flag, logg] = pcg_gauss_newton(problem)
         cost       = norm(r_val,2)/2;        
         Jk_norm_new   = norm(Jk_val, 2);
         rho        = (Jk_norm_new - Jk_norm)/Jk_norm;
-        Jk_norm     = Jk_norm_new;
+        Jk_norm    = Jk_norm_new;
 %         norm(dfval)
         x0 = x0+p;
         
@@ -51,10 +51,11 @@ function [xsol, flag, logg] = pcg_gauss_newton(problem)
         end
         % recording in current iteration
         logg.xk(:,i)           = x0;
+        logg.pk(:,i)           = p;
         logg.iter(i)           = i;
         logg.fval(i)           = cost;
         logg.dfval(i)          = Jk_norm;
-        logg.rel_steplength(i) = rel_steplength;
+%         logg.rel_steplength(i) = rel_steplength;
         i = i + 1;
     end
         xsol = x0;

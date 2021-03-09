@@ -19,9 +19,9 @@ x   = x + rho*p;        % update state
 r   = r + rho*Ap;       % update residual
 y   = C_T'\(C_T\r);    
 ry_new = r'*y;
-b   = ry_new/ry;        % update the parameter to ensure conjugate 
+beta   = ry_new/ry;        % update the parameter to ensure conjugate 
 ry  = ry_new;
-p   = -y + b*p;
+p   = -y + beta*p;
 Ap  = A*p;
 i   = i+1;
 end

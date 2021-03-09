@@ -1,5 +1,5 @@
 function [xsol, flag, logg] = pcg_steihaug_gauss_newton(problem)
-    % Gauss-Newtond with preconditioned conjugate gradient 
+    % Gauss-Newtond with standard conjugate gradient 
     % intial
     if isempty(problem.options)
         problem.options = nlsProblem;
@@ -7,55 +7,85 @@ function [xsol, flag, logg] = pcg_steihaug_gauss_newton(problem)
         tol      = problem.options.tol;
         iter_max = problem.options.iter_max;
     end
-    x0       = problem.x0;
-    Nx       = numel(x0);
-
-    % create logg from interInfo class
-    logg = iterInfo(iter_max, Nx); 
+    tol     = tol^2;    
     
-    % start Gauss-Newton method
-    r      = problem.r;          % residual fucntion
-    Jk     = problem.drdx;       % jacobian function
-    r_val  = r(x0);              % initial residual
-    Jk_val = Jk(x0);             % initial jacobian matrix
-    Jk_norm = norm(Jk_val,2);
-    B      = @(x) (Jk(x))'*Jk(x);% approximation of Hessian
-    flag  = false;
-    i =1;
-    while i<iter_max && ~flag 
-        B_mat_sparse = sparse(B(x0));
-        % gauss-newton step
-        p_class  = - B_mat_sparse\ (Jk_val'*r_val);
-        % gauss-newton step by conjugate gradient
-%         p_gn     = conjugate_gradient(B_mat_sparse,-Jk_val'*r_val,tol,iter_max);
-        % preconditioned gauss-newton step - sparse form ichol(B_mat)
-        C_T      = ichol(B_mat_sparse);
-%       
-        p        = preconditioned_cg_steihaug(B_mat_sparse,-Jk_val'*r_val,tol,iter_max,C_T);
+    % initial Gauss-Newton method
+    xk       = problem.x0;
+    xx0      = xk'*xk;
+    r        = problem.r;          % residual fucntion
+    Jk       = problem.drdx;       % jacobian function
+    
+    r_vector = r(xk);              % initial residual vector   
+    Jk_mat   = sparse(Jk(xk));             % initial jacobian matrix
+    B_mat    = Jk_mat'*Jk_mat;     % initial hessian approximation for LS
+    grad     = Jk_mat'*r_vector;   % initial gradient
+    fval_k   = r_vector'*r_vector/2; % initial cost
+    
+    % create logg from interInfo class
+    Nx       = numel(xk);
+    logg     = iterInfo(iter_max, Nx); 
+    
+    % initial trust region 
+    eta1     = 0.05;               % trial step acceptable?
+    eta2     = 0.9;                % quadratic model very accurate?
+    theta1   = 2.5;                % multiplier for increasing radius of trust region
+    theta2   = 0.25;               % multiplier for decreasing radius of trust region
+    delta    = max(abs(grad));      % initial radius of trust region
+    
+    
+    flag     = false;
+    i        = 1;
+    while i<=iter_max && ~flag 
+
         
-        % relative steplength
-        rel_steplength = norm(p,2)/norm(x0,2);
-        if isnan(rel_steplength), rel_steplength = 0; end
-        Jk_val     = Jk(x0+p);
-        r_val      = problem.r(x0+p);
-        cost       = norm(r_val,2)/2;        
-        Jk_norm_new   = norm(Jk_val, 2);
-        rho        = (Jk_norm_new - Jk_norm)/Jk_norm;
-        Jk_norm     = Jk_norm_new;
-%         norm(dfval)
-        x0 = x0+p;
-        
-        if  rel_steplength<=tol 
-            xsol = x0;
-            flag = true;
+        % gauss-newton step by preconditioned CG-Steihaug
+        C_T          = ichol(B_mat);
+        p_pcg        = pcg_steihaug(B_mat,-grad,tol,iter_max,delta,C_T);
+%         p_p        = preconditioned_cg(B_mat,-grad,tol,iter_max,C_T);
+%         p            = cg_steihaug(B_mat,-grad,tol,iter_max,delta);
+%          norm(p-p_pcg,2)
+        % updating trustworthness of trust-region
+        logg.dfval(i) = - p_pcg'*grad - p_pcg'*B_mat*p_pcg/2;   % mk(xk)-mk(xk+pk)      
+        r_vector_new  = r(xk+p_pcg);                           % residual vector   
+        logg.fval(i)  = r_vector_new'*r_vector_new/2;         % cost-value    
+        rho           = (fval_k-logg.fval(i))/logg.dfval(i);  % trustworthness rho
+        pp            = p_pcg'*p_pcg;
+        % updating radius of trust-region
+        if rho<=eta1
+            
+            % trial step not acceptable, shrink size of TR
+            delta         = theta2*sqrt(pp);
+            
+        else
+            
+            % trial step accaptable
+            xk = xk+p_pcg;
+            logg.pk(:,i)  = p_pcg;
+            
+            % approxiamation is very satisfying, expand size of TR
+            if rho>eta2
+                delta     = max(theta1*sqrt(pp),delta);
+            end        
+            
+            % updating parameters    
+            r_vector      = r_vector_new;       % new residual vector   
+            Jk_mat        = sparse(Jk(xk));             % new jacobian matrix
+            B_mat         = Jk_mat'*Jk_mat;     % new hessian approximation for LS
+            grad          = Jk_mat'*r_vector;   % new gradient
+            fval_k        = logg.fval(i);       % new cost
+            
+            % terminate if termination condition satisfied
+            if  pp<=tol*xx0 || grad'*grad<=tol
+                xsol = xk;
+                flag = true;
+                return;
+            end
         end
         % recording in current iteration
-        logg.xk(:,i)           = x0;
-        logg.iter(i)           = i;
-        logg.fval(i)           = cost;
-        logg.dfval(i)          = Jk_norm;
-        logg.rel_steplength(i) = rel_steplength;
+        logg.xk(:,i)  = xk;
+        logg.iter(i)  = i;
+        logg.delta(i) = delta;  
         i = i + 1;
     end
-        xsol = x0;
+        xsol = xk;
 end
