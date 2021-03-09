@@ -35,6 +35,9 @@ classdef iterInfo
                 obj.iter    = obj.iter(idx);
                 obj.fval    = obj.fval(idx);
                 obj.dfval   = obj.dfval(idx);
+                if ~isempty(obj.delta)
+                    obj.delta   = obj.delta(idx);
+                end
                 if ~isempty(obj.xk) && ~isempty(obj.pk)
                     obj.xk      = obj.xk(:,idx);
                     obj.pk      = obj.pk(:,idx);

@@ -13,13 +13,22 @@ test.x0   = x0;
 test.r    = r;
 test.drdx = drdx;
 % setting options for solving nls problem
-tol       = 10^(-6);
+tol       = 10^(-10);
 iter_max  = 100;
-test.options = nlsOption(iter_max,tol,'CG-Steihaug gauss-newton');
 %% run internal nls solver
-[xsol_gn, logg, flag] = test.solve_nls;
-logg = logg.post_dataprocessing;                       
+test.options = nlsOption(iter_max,tol,'PCG-Steihaug gauss-newton');
+
+[xsol_gn, logg, flag] = test.solve_nls;                    
+           
 
 %% plot result
+compare_results(xval,xsol_gn)
+plot_results(xval,logg,r,d,y)
+
+
+%% run internal nls solver
+test.options = nlsOption(iter_max,tol,'CG-Steihaug gauss-newton');
+
+[xsol_gn, logg, flag] = test.solve_nls;    
 compare_results(xval,xsol_gn)
 plot_results(xval,logg,r,d,y)
