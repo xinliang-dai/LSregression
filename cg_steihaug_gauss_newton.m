@@ -23,7 +23,7 @@ function [xsol, flag, logg] = cg_steihaug_gauss_newton(problem)
     Jk       = problem.drdx;       % jacobian function
     
     r_vector = r(xk);              % initial residual vector   
-    Jk_mat   = Jk(xk);             % initial jacobian matrix
+    Jk_mat   = sparse(Jk(xk));             % initial jacobian matrix
     B_mat    = Jk_mat'*Jk_mat;     % initial hessian approximation for LS
     grad     = Jk_mat'*r_vector;   % initial gradient
     fval_k   = r_vector'*r_vector/2; % initial cost
@@ -67,7 +67,7 @@ function [xsol, flag, logg] = cg_steihaug_gauss_newton(problem)
             
             % updating parameters    
             r_vector     = r_vector_new;       % new residual vector   
-            Jk_mat       = Jk(xk);             % new jacobian matrix
+            Jk_mat       = sparse(Jk(xk));             % new jacobian matrix
             B_mat        = Jk_mat'*Jk_mat;     % new hessian approximation for LS
             grad         = Jk_mat'*r_vector;   % new gradient
             fval_k       = logg.fval(i);       % new cost
