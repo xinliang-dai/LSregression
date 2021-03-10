@@ -7,7 +7,7 @@ function [xsol, flag, logg] = pcg_steihaug_gauss_newton(problem)
         tol      = problem.options.tol;
         iter_max = problem.options.iter_max;
     end
-    tol     = tol^2;    
+    tol      = tol^2;    
     
     % initial Gauss-Newton method
     xk       = problem.x0;
@@ -16,7 +16,7 @@ function [xsol, flag, logg] = pcg_steihaug_gauss_newton(problem)
     Jk       = problem.drdx;       % jacobian function
     
     r_vector = r(xk);              % initial residual vector   
-    Jk_mat   = sparse(Jk(xk));             % initial jacobian matrix
+    Jk_mat   = sparse(Jk(xk));     % initial jacobian matrix
     B_mat    = Jk_mat'*Jk_mat;     % initial hessian approximation for LS
     grad     = Jk_mat'*r_vector;   % initial gradient
     fval_k   = r_vector'*r_vector/2; % initial cost
@@ -25,7 +25,7 @@ function [xsol, flag, logg] = pcg_steihaug_gauss_newton(problem)
     Nx       = numel(xk);
     logg     = iterInfo(iter_max, Nx); 
     
-    % initial trust region 
+    % initial trust region - typical choices described by "Trust Region Methods"
     eta1     = 0.05;               % trial step acceptable?
     eta2     = 0.9;                % quadratic model very accurate?
     theta1   = 2.5;                % multiplier for increasing radius of trust region
@@ -39,11 +39,9 @@ function [xsol, flag, logg] = pcg_steihaug_gauss_newton(problem)
 
         
         % gauss-newton step by preconditioned CG-Steihaug
-        C_T          = ichol(B_mat);
+        C_T          = ichol(B_mat);        % incomplete cholosky to determine M = C^T * C;
         p_pcg        = pcg_steihaug(B_mat,-grad,tol,iter_max,delta,C_T);
-%         p_p        = preconditioned_cg(B_mat,-grad,tol,iter_max,C_T);
-%         p            = cg_steihaug(B_mat,-grad,tol,iter_max,delta);
-%          norm(p-p_pcg,2)
+
         % updating trustworthness of trust-region
         logg.dfval(i) = - p_pcg'*grad - p_pcg'*B_mat*p_pcg/2;   % mk(xk)-mk(xk+pk)      
         r_vector_new  = r(xk+p_pcg);                           % residual vector   
@@ -82,6 +80,7 @@ function [xsol, flag, logg] = pcg_steihaug_gauss_newton(problem)
             end
         end
         % recording in current iteration
+        logg.grad(:,i)= grad;
         logg.xk(:,i)  = xk;
         logg.iter(i)  = i;
         logg.delta(i) = delta;  

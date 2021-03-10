@@ -1,22 +1,26 @@
 classdef iterInfo
     % record information in iterations
     properties
-        iter           int8 {mustBeNumeric}
+        iter           int8   {mustBeNumeric}
         xk             double {mustBeNumeric}
         fval           double {mustBeNumeric}
+        grad           double {mustBeNumeric}
         dfval          double {mustBeNumeric}
         pk             double {mustBeNumeric}
         delta          double {mustBeNumeric}
         xk_norm        double {mustBeNumeric}
-        pk_norm        double {mustBeNumeric}        
+        pk_norm        double {mustBeNumeric}     
+        grad_norm      double {mustBeNumeric}     
+
     end
     
     methods
         % constructor with maximal iteration and dimension of variables
         function obj = iterInfo(iter_max,Nx)
             if nargin>1
-                obj.xk = zeros(Nx,iter_max);
-                obj.pk = zeros(Nx,iter_max);
+                obj.xk   = zeros(Nx,iter_max);
+                obj.pk   = zeros(Nx,iter_max);
+                obj.grad = zeros(Nx,iter_max);
             end
             % initial recording
             obj.iter           = zeros(iter_max,1);
@@ -26,7 +30,7 @@ classdef iterInfo
         end
         
         % post-dataprocessing: reduce zeros column
-        function obj = post_dataprocessing(obj)
+        function obj = iter_dataprocessing(obj)
             if isempty(obj.iter)
                 warning('iterative record error')
             else
@@ -38,13 +42,15 @@ classdef iterInfo
                 if ~isempty(obj.delta)
                     obj.delta   = obj.delta(idx);
                 end
-                if ~isempty(obj.xk) && ~isempty(obj.pk)
+                if ~isempty(obj.xk) && ~isempty(obj.pk) && ~isempty(obj.grad)
                     obj.xk      = obj.xk(:,idx);
                     obj.pk      = obj.pk(:,idx);
+                    obj.grad    = obj.grad(:,idx);
                     % norm of xk and pk
                     for i = 1:numel(idx)
-                        obj.xk_norm(i) = obj.xk(:,i)'* obj.xk(:,i);
-                        obj.pk_norm(i) = obj.pk(:,i)'* obj.pk(:,i);
+                        obj.xk_norm(i)   = sqrt(obj.xk(:,i)'* obj.xk(:,i));
+                        obj.pk_norm(i)   = sqrt(obj.pk(:,i)'* obj.pk(:,i));
+                        obj.grad_norm(i) = sqrt(obj.grad(:,i)'* obj.grad(:,i));
                     end
                 end
             end
