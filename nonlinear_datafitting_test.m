@@ -2,7 +2,10 @@
 clear;
 close all;
 clc
-addpath(genpath('../nonlinear_LSsolvers/'));
+addpath class_def;
+addpath nls_solvers;
+addpath data;
+addpath post_dataprocessing;
 %% create data 
 % [d,y,r,drdx,x0,xval] = dim_1_case;
 [d,y,r,drdx,x0,xval] = dim_2_case;
