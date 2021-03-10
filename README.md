@@ -17,19 +17,19 @@ Implementing _Gauss-Newton_ with different _conjugate gradient_ methods, includi
 
 ### Getting Start
 
-Carrying out data-fitting test: [nonlinear_datafitting_test.m](../tree/main/nonlinear_datafitting_test.m)
+Carrying out data-fitting test: [nonlinear_datafitting_test.m](../main/nonlinear_datafitting_test.m)
 
-Nonlinear Least-Squares solver: [pcg_steihaug_gauss_newton.m](../tree/main/nls_solvers/pcg_steihaug_gauss_newton.m)
+Nonlinear Least-Squares solver: [pcg_steihaug_gauss_newton.m](../main/nls_solvers/pcg_steihaug_gauss_newton.m)
 
 ### ClassDef
 
-Example cases saved in [data folder](../tree/main/data)
+Example cases saved in [data folder](../main/data)
 
- - [dim_1_case](../tree/main/data/dim_1_case.m):
+ - [dim_1_case](../main/data/dim_1_case.m):
 f_i(x) = exp(d_i*x)
 
- - [dim_2_case.m](../tree/main/data/dim_2_case.m):
+ - [dim_2_case.m](../main/data/dim_2_case.m):
 f_i(x) = exp( d_i * x_1 ) * sin( d_i * x_2 )
 
- - [dim_2_quadratic_case.m](../tree/main/data/dim_2_quadratic_case.m):
+ - [dim_2_quadratic_case.m](../main/data/dim_2_quadratic_case.m):
  f_i(x) = d_i * x_1  +  d_i.^2 * x_2
