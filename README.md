@@ -1,2 +1,3 @@
 # LSregression
-Methods for solving Nonlinear Least-squares Regression
+
+_Gauss-Newton_ with _preconditioned CG-Steihaug_
