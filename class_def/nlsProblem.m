@@ -10,7 +10,7 @@ classdef nlsProblem
         x0         double    {mustBeNumeric}
         %
         bound      double    {mustBeNumeric}
-        options    nlsOption = nlsOption;
+        options    nlsOption
     end
     
     methods
@@ -32,26 +32,34 @@ classdef nlsProblem
         % solve the nonlinear least-squares problem
         function [xsol, logg, flag]= solve_nls(obj)
             % switch from different methods
-            switch obj.options.method
-                case {'internal'}
-                    [xsol,~,~,flag] = lsqnonlin(obj.r, obj.x0);
-                    logg            = nan;
-                case {'class gauss-newton'}
-                    [xsol,flag,logg] = basic_gauss_newton(obj);
-%                     logg = logg.iter_dataprocessing;
-                case ('CG gauss-newton')
-                    [xsol,flag,logg] = cg_gauss_newton(obj);
-%                     logg = logg.iter_dataprocessing;  
-                case ('PCG gauss-newton')
-                    [xsol,flag,logg] = pcg_gauss_newton(obj);
-%                     logg = logg.iter_dataprocessing;   
-                case ('CG-Steihaug gauss-newton')
-                    [xsol,flag,logg] = cg_steihaug_gauss_newton(obj);
-%                     logg = logg.iter_dataprocessing;
-                case ('PCG-Steihaug gauss-newton')
+            if isempty(obj.options)
+                obj.options = nlsOption;
+            end
+            switch obj.options.nls_method
+                case {'Gauss-Newton'}
                     [xsol,flag,logg] = pcg_steihaug_gauss_newton(obj);
-%                     logg = logg.iter_dataprocessing;
-            end                
+                    logg = logg.iter_dataprocessing;
+                case {'Levenberg-Marquardt'}
+            end
+%                 case {'internal'}
+%                     [xsol,~,~,flag] = lsqnonlin(obj.r, obj.x0);
+%                     logg            = nan;
+%                 case {'class gauss-newton'}
+%                     [xsol,flag,logg] = basic_gauss_newton(obj);
+% %                     logg = logg.iter_dataprocessing;
+%                 case ('CG gauss-newton')
+%                     [xsol,flag,logg] = cg_gauss_newton(obj);
+% %                     logg = logg.iter_dataprocessing;  
+%                 case ('PCG gauss-newton')
+%                     [xsol,flag,logg] = pcg_gauss_newton(obj);
+% %                     logg = logg.iter_dataprocessing;   
+%                 case ('CG-Steihaug gauss-newton')
+%                     [xsol,flag,logg] = cg_steihaug_gauss_newton(obj);
+% %                     logg = logg.iter_dataprocessing;
+%                 case ('PCG-Steihaug gauss-newton')
+%                     [xsol,flag,logg] = pcg_steihaug_gauss_newton(obj);
+% %                     logg = logg.iter_dataprocessing;
+%                             
         end      
         % check the dimension of lower and upper bounds
         function bool = check_bound_dim(obj)
