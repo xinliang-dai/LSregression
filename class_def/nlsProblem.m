@@ -40,6 +40,8 @@ classdef nlsProblem
                     [xsol,flag,logg] = pcg_steihaug_gauss_newton(obj);
                     logg = logg.iter_dataprocessing;
                 case {'Levenberg-Marquardt'}
+                    [xsol,flag,logg] = standart_levenberg_marquardt(obj);
+                    logg = logg.iter_dataprocessing;                    
             end
 %                 case {'internal'}
 %                     [xsol,~,~,flag] = lsqnonlin(obj.r, obj.x0);
