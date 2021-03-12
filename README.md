@@ -2,18 +2,30 @@
 
 ### Introduction
 
-Implementing _Gauss-Newton_ with different _conjugate gradient_ methods, including
+- Implementing _Gauss-Newton_ with different _conjugate gradient_ methods, including
 
-- without _conjugate gradient_
+  - without _conjugate gradient_
 
-- _standard conjugate gradient_
+  - _standard conjugate gradient_
 
-- _preconditioned conjugate gradient_
+  - _preconditioned conjugate gradient_
 
-- _CG-Steihaug_
+  - _CG-Steihaug_
 
-- _preconditioned CG-Steihaug_
+  - _preconditioned CG-Steihaug_
 
+- Implementing _Levenberg-Marquardt_ with some methods to increase speed and robustness
+
+  - damping strategy of lambda, due to Nielsen:
+
+    - [Methods for nonlinear least squares problems](http://www2.imm.dtu.dk/pubdb/edoc/imm3215.pdf) - introduction and comparison
+
+    - [Damping Parameter in Marquardt's Method](http://www.imm.dtu.dk/documents/ftp/tr99/tr05_99.pdf) - original & statistic detail
+
+  - _CG-Steihaug_
+
+  - _preconditioning_
+ 
 
 ### Getting Start
 
