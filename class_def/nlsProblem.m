@@ -41,6 +41,9 @@ classdef nlsProblem
                     logg = logg.iter_dataprocessing;
                 case {'Levenberg-Marquardt'}
                     [xsol,flag,logg] = standart_levenberg_marquardt(obj);
+                    logg = logg.iter_dataprocessing;                  
+                case {'Nielsen Levenberg-Marquardt'}
+                    [xsol,flag,logg] = nielsen_levenberg_marquardt(obj);
                     logg = logg.iter_dataprocessing;                    
             end
 %                 case {'internal'}

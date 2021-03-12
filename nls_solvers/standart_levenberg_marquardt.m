@@ -97,7 +97,7 @@ function [xsol, flag, logg] = standart_levenberg_marquardt(problem)
         end
         % updating radius of trust region
 %         if trust_region
-            dmval         = - pk'*grad - pk'*B_mat*pk/2;  % mk(xk)-mk(xk+pk)  
+            dmval         = 0.5*pk'*(lambda*pk-grad);  % mk(xk)-mk(xk+pk)  
             rho           = logg.dfval(i)/dmval;          % trustworthness rho
             % updating trustworthness rho and radius of trust-region
             if rho<=eta1  
