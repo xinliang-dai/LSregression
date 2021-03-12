@@ -17,14 +17,18 @@ test_model      = nlsProblem(r, drdx, data.x0);
 % setting options for solving nls problem
 tol        = 10^(-10);
 iter_max   = 1000;
-nls_method = 'Gauss-Newton';
+% nls_method = 'Gauss-Newton';
 % nls_method = 'Levenberg-Marquardt';
 % cg_method  = 'without CG';
 % cg_method  = 'standard CG';
 % cg_method  = 'preconditioned CG';
 % cg_method  = 'CG-Steihaug';
 cg_method  = 'preconditioned CG-Steihaug';
-nls_method  = 'Nielsen Levenberg-Marquardt';
+nls_method  = 'Levenberg-Marquardt';
+% nls_method  = 'preconditioned Levenberg-Marquardt';
+% cg_method  = 'without CG';
+cg_method  = 'CG-Steihaug';
+
 %% run internal nls solver
 test_model.options = nlsOption(iter_max, tol, nls_method, cg_method);
 [data.xsol, data.logg, flag] = test_model.solve_nls;                    

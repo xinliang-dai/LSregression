@@ -8,12 +8,12 @@ classdef iterInfo
         dfval          double {mustBeNumeric}
         dmval          double {mustBeNumeric} 
         pk             double {mustBeNumeric}
-        delta          double {mustBeNumeric}
         xk_norm        double {mustBeNumeric}
         pk_norm        double {mustBeNumeric}     
         grad_norm      double {mustBeNumeric}     
         rho            double {mustBeNumeric}     
-
+        mu             double {mustBeNumeric}     
+        delta          double {mustBeNumeric} 
     end
     
     methods
@@ -31,6 +31,7 @@ classdef iterInfo
             obj.dmval          = zeros(iter_max,1);
             obj.delta          = zeros(iter_max,1);
             obj.rho            = zeros(iter_max,1);
+            obj.mu             = zeros(iter_max,1);
         end
         
         % post-dataprocessing: reduce zeros column
@@ -44,6 +45,7 @@ classdef iterInfo
                 obj.fval    = obj.fval(idx);
                 obj.dfval   = obj.dfval(idx);
                 obj.delta   = obj.delta(idx);
+                obj.mu      = obj.mu(idx);
                 obj.rho     = obj.rho(idx);
                 if ~isempty(obj.xk) && ~isempty(obj.pk) && ~isempty(obj.grad)
                     obj.xk      = obj.xk(:,idx);
