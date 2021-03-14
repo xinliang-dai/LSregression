@@ -54,9 +54,7 @@ function [xsol, flag, logg] = doglet_gauss_newton(problem)
     
     % initial preconditioning
     if precondition
-        C_T      = ichol(B_mat);        % incomplete cholosky to determine M = C^T * C;
-    else
-        C_T      = [];
+        options.diagcomp = 10^-6;
     end
     
     % initial trust region - typical choices described by "Trust Region Methods"
@@ -64,14 +62,13 @@ function [xsol, flag, logg] = doglet_gauss_newton(problem)
     eta2     = 0.9;                % quadratic model very accurate?
     theta1   = 2.5;                % multiplier for increasing radius of trust region
     theta2   = 0.25;               % multiplier for decreasing radius of trust region
-    delta    = max(abs(grad));     % initial radius of trust region
-
+    delta    = sqrt(grad'*grad);     % initial radius of trust region
     
     % start Gauss-Newton iterates
     while i<=iter_max && ~flag
         dd       = delta^2;
         if precondition
-            C_T      = ichol(B_mat);        % incomplete cholosky to determine M = C^T * C;
+            C_T      = ichol(B_mat,options);        % incomplete cholosky to determine M = C^T * C;
         else
             C_T      = [];
         end        

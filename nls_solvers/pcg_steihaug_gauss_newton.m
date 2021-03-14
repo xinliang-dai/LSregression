@@ -58,9 +58,7 @@ function [xsol, flag, logg] = pcg_steihaug_gauss_newton(problem)
     
     % initial preconditioning
     if precondition
-        C_T      = ichol(B_mat);        % incomplete cholosky to determine M = C^T * C;
-    else
-        C_T      = [];
+        options.diagcomp = 10^-6;
     end
     
     % initial trust region - typical choices described by "Trust Region Methods"
@@ -69,18 +67,25 @@ function [xsol, flag, logg] = pcg_steihaug_gauss_newton(problem)
         eta2     = 0.9;                % quadratic model very accurate?
         theta1   = 2.5;                % multiplier for increasing radius of trust region
         theta2   = 0.25;               % multiplier for decreasing radius of trust region
-        delta    = max(abs(grad));     % initial radius of trust region
+        delta    = sqrt(grad'*grad);     % initial radius of trust region
     else
         delta    = [];
     end
     
     % start Gauss-Newton iterates
     while i<=iter_max && ~flag 
+        
+        
         % Gauss-Newton step
         if ~CG_activated
             % Gauss-Newton without CG method
             pk = - B_mat\ grad;
         else
+            if precondition
+                C_T      = ichol(B_mat,options);        % incomplete cholosky to determine M = C^T * C;
+            else
+                C_T      = [];
+            end
             % Gauss-Newton with CG method
             pk = pcg_steihaug(B_mat,-grad,toltol,iter_max,delta,C_T);
         end
@@ -94,10 +99,10 @@ function [xsol, flag, logg] = pcg_steihaug_gauss_newton(problem)
         end
         % updating radius of trust region
         if trust_region
-            dmval         = - pk'*grad - pk'*B_mat*pk/2;  % mk(xk)-mk(xk+pk)  
-            rho           = logg.dfval(i)/dmval;          % trustworthness rho
+            logg.dmval(i) = - pk'*grad - pk'*B_mat*pk/2;  % mk(xk)-mk(xk+pk)
+            logg.rho(i)   = logg.dfval(i)/logg.dmval(i);          % trustworthness rho
             % updating trustworthness rho and radius of trust-region
-            if rho<=eta1  
+            if logg.rho(i)<=eta1  
                 % trial step not acceptable, shrink size of TR
                 delta         = theta2*sqrt(pp);
                 pk            = 0;
@@ -105,7 +110,7 @@ function [xsol, flag, logg] = pcg_steihaug_gauss_newton(problem)
                 % trial step accaptable
                 xk = xk+pk;
                 % approxiamation is very satisfying, expand size of TR
-                if rho>eta2
+                if logg.rho(i)>eta2
                     delta     = max(theta1*sqrt(pp),delta);
                 end
                 % updating sensitivities
@@ -119,10 +124,11 @@ function [xsol, flag, logg] = pcg_steihaug_gauss_newton(problem)
             % updating sensitivities
             [grad, B_mat] = update_sensitivities(Jk,xk,r_vector);
             fval_k        = logg.fval(i);       % new cost
+            if  grad'*grad<=toltol % || abs(logg.dfval(i))<=tol
+                flag = true;
+            end
         end
         % recording iter Info of current iteration
-        logg.dmval(i) = dmval;
-        logg.rho(i)   = rho;
         logg.pk(:,i)  = pk;
         logg.grad(:,i)= grad;
         logg.xk(:,i)  = xk;

@@ -41,7 +41,7 @@ function [xsol, flag, logg] = pc_steihaug_levenberg_marquardt(problem,preconditi
             eta2     = 0.9;                % quadratic model very accurate?
             theta1   = 2.5;                % multiplier for increasing radius of trust region
             theta2   = 0.25;               % multiplier for decreasing radius of trust region
-            delta    = max(abs(grad));     % initial radius of trust region            
+            delta    = sqrt(grad'*grad);     % initial radius of trust region            
         otherwise 
             warning('CG method not found, using CG-Steihaug method')
             cg_steihaug_activated=true;
@@ -49,7 +49,7 @@ function [xsol, flag, logg] = pc_steihaug_levenberg_marquardt(problem,preconditi
             eta2     = 0.9;                % quadratic model very accurate?
             theta1   = 2.5;                % multiplier for increasing radius of trust region
             theta2   = 0.25;               % multiplier for decreasing radius of trust region
-            delta    = max(abs(grad));     % initial radius of trust region
+            delta    = sqrt(grad'*grad);     % initial radius of trust region
     end
     
     % Nielsen damping strategies of Levenberg-Marquardt method

@@ -2,7 +2,7 @@ classdef DataGenerator
     %DATAGENERATOR Summary of this class goes here
     %   Detailed explanation goes here    
     properties
-        d               {mustBeNumeric}
+        t               {mustBeNumeric}
         y               {mustBeNumeric}
         x0              {mustBeNumeric}
         xref            {mustBeNumeric}
@@ -27,7 +27,7 @@ function plot_results(obj,r)
 
 xref  = obj.xref;
 logg  = obj.logg;
-d     = obj.d;
+t     = obj.t;
 y     = obj.y;
 Niter = numel(logg.iter);
 dx    = zeros(Niter,1);
@@ -95,14 +95,16 @@ xlim(x_bound)
 ylim(plot_y_limit(logg.pk_norm))
 grid on 
 
+if ~isempty(obj.y) && ~isempty(obj.t)
 y_estimate = r(logg.xk(:,end))+y;
 figure('Name','Best fit for measured data')
-plot(d,y,'ko',d,y_estimate,'b-')
+plot(t,y,'ko',t,y_estimate,'b-')
 legend('Data','Best fit')
 xlabel('t')
 ylabel('data')
 % ylim(plot_y_limit(y_estimate))
 grid on 
+end
 
 end
 

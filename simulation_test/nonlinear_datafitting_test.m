@@ -2,13 +2,14 @@
 clc
 clear
 close all
-addpath class_def;
-addpath nls_solvers;
-addpath data;
+addpath(genpath('../data/'));
+addpath(genpath('../class_def/'));
+addpath(genpath('../nls_solvers/'));
 %% create data 
 % [data,r,drdx] = dim_1_case;
-[data,r,drdx] = dim_2_case;
+% [data,r,drdx] = dim_2_case;
 % [data,r,drdx] = dim_2_quadratic_case;
+[data,r,drdx] = dim_4_case;
 
 %% initial math model for nonlinear least-squares problem
 % initial test model
@@ -42,6 +43,13 @@ data.post_dataprocessing(test_model.r);
 %%
 nls_method  = 'preconditioned Levenberg-Marquardt';
 cg_method  = 'CG-Steihaug';
+test_model.options = nlsOption(iter_max, tol, nls_method, cg_method);
+[data.xsol, data.logg, flag] = test_model.solve_nls;                    
+data.post_dataprocessing(test_model.r);
+
+%%
+nls_method  = 'Gauss-Newton';
+cg_method  = 'preconditioned CG-Steihaug';
 test_model.options = nlsOption(iter_max, tol, nls_method, cg_method);
 [data.xsol, data.logg, flag] = test_model.solve_nls;                    
 data.post_dataprocessing(test_model.r);

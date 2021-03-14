@@ -5,7 +5,7 @@ addpath(genpath('../data/'));
 addpath(genpath('../class_def/'));
 addpath(genpath('../nls_solvers/'));
 %%
-n =11;
+n =;
 cond_A = zeros(n,1);
 e_inv = zeros(n,1);
 t_inv = zeros(n,1);
@@ -42,10 +42,13 @@ for i = 1:n
     t_pinv(i)        = toc;
     e_pinv(i)        = norm(xref - x,inf);
     % cg
-    tic
-    [x_cg,i_cg(i)]   = pcg_steihaug(A,b,[],N(i),[]);
-    t_cg(i)          = toc;
-    e_cg(i)          = norm(xref - x_cg,inf);
+%     tic
+%     [x_cg,i_cg(i)]   = pcg_steihaug(A,b,[],N(i),[]);
+%     t_cg(i)          = toc;
+%     e_cg(i)          = norm(xref - x_cg,inf);
+%     
+    
+    
     % pcg
     A                = sparse(A);
     tic
@@ -53,6 +56,15 @@ for i = 1:n
     [x_pcg,i_pcg(i)] = pcg_steihaug(A,b,[],N(i),C_T);    
     t_pcg(i)         = toc;
     e_pcg(i)         = norm(xref - x_pcg,inf);
+    % pcg-2
+    dk                = diag(ichol(A,options));
+    dk(dk==0)        = 1e-5;
+    Dk               = diag(dk);
+    [x_cg,i_cg(i)] = pcg_steihaug(A,b,[],N(i),Dk);    
+    t_cg(i)         = toc;
+    e_cg(i)         = norm(xref - x_cg,inf);
+   
+    
 end
 %%
 plot_ill_condition_result(t_inv,t_pinv,t_pcg,t_cg, e_inv,e_pinv,e_cg,e_pcg,i_cg,i_pcg,N,cond_A)

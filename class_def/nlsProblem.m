@@ -27,8 +27,7 @@ classdef nlsProblem
                 obj.bound = bound;
                 obj.check_bound_dim;
             end
-        end
-        
+        end        
         % solve the nonlinear least-squares problem
         function [xsol, logg, flag]= solve_nls(obj)
             % switch from different methods
