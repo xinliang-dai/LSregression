@@ -70,6 +70,11 @@ function [xsol, flag, logg] = doglet_gauss_newton(problem)
     % start Gauss-Newton iterates
     while i<=iter_max && ~flag
         dd       = delta^2;
+        if precondition
+            C_T      = ichol(B_mat);        % incomplete cholosky to determine M = C^T * C;
+        else
+            C_T      = [];
+        end        
         % Gauss-Newton step
         if ~CG_activated
             % Gauss-Newton without CG method
