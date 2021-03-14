@@ -47,8 +47,9 @@ classdef nlsProblem
                     preconditioned   = true;
                     [xsol,flag,logg] = pc_steihaug_levenberg_marquardt(obj,preconditioned);
                     logg = logg.iter_dataprocessing;                    
-                case {'Gauss-Newton with Dogleg'}
-         
+                case {'Dogleg Gauss-Newton'}
+                    [xsol,flag,logg] = doglet_gauss_newton(obj);
+                    logg = logg.iter_dataprocessing;         
             end
 %                 case {'internal'}
 %                     [xsol,~,~,flag] = lsqnonlin(obj.r, obj.x0);

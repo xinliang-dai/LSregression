@@ -23,15 +23,25 @@ iter_max   = 1000;
 % cg_method  = 'standard CG';
 % cg_method  = 'preconditioned CG';
 % cg_method  = 'CG-Steihaug';
-cg_method  = 'preconditioned CG-Steihaug';
-nls_method  = 'Levenberg-Marquardt';
+% cg_method  = 'preconditioned CG-Steihaug';
+% nls_method  = 'Levenberg-Marquardt';
 % nls_method  = 'preconditioned Levenberg-Marquardt';
 % cg_method  = 'without CG';
-cg_method  = 'CG-Steihaug';
+% cg_method  = 'CG-Steihaug';
+nls_method  = 'Dogleg Gauss-Newton';
+cg_method  = 'preconditioned CG';
+
 
 %% run internal nls solver
 test_model.options = nlsOption(iter_max, tol, nls_method, cg_method);
 [data.xsol, data.logg, flag] = test_model.solve_nls;                    
 % iter Information processing
 %% results
+data.post_dataprocessing(test_model.r);
+
+%%
+nls_method  = 'preconditioned Levenberg-Marquardt';
+cg_method  = 'CG-Steihaug';
+test_model.options = nlsOption(iter_max, tol, nls_method, cg_method);
+[data.xsol, data.logg, flag] = test_model.solve_nls;                    
 data.post_dataprocessing(test_model.r);
