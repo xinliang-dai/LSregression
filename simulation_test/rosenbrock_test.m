@@ -9,7 +9,8 @@ addpath(genpath('../nls_solvers/'));
 % [data,r,drdx] = dim_1_case;
 % [data,r,drdx] = dim_2_case;
 % [data,r,drdx] = dim_2_quadratic_case;
-[data,r,drdx,cost] = rosenbrock;
+[data,r,drdx,cost] = exp_sin_func;
+% [data,r,drdx,cost] = exp_sin_func;
 
 test_model      = nlsProblem(r, drdx, data.x0);
 
@@ -30,7 +31,7 @@ nls_method = 'Gauss-Newton';
 x = linspace(-3,3); y = linspace(-3,5);
 [xx,yy] = meshgrid(x,y); 
 ff = log(cost(xx,yy));
-levels = 1:8;
+levels = -10:1:10;
 LW = 'linewidth'; FS = 'fontsize'; MS = 'markersize';
 figure, contour(x,y,ff,levels,LW,1.2), colormap(jet) 
 colorbar
@@ -63,7 +64,7 @@ test_model.options = nlsOption(iter_max, tol, nls_method, cg_method);
 track = [data.x0,data.logg.xk];
 plot(track(1,:),track(2,:))
 
-data.post_dataprocessing(test_model.r);
+% data.post_dataprocessing(test_model.r);
 % iter Information processing
 %% results
 data.post_dataprocessing(test_model.r);

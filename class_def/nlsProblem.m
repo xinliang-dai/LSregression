@@ -29,46 +29,42 @@ classdef nlsProblem
             end
         end        
         % solve the nonlinear least-squares problem
-        function [xsol, logg, flag]= solve_nls(obj)
+        function [xsol, logg, flag, t]= solve_nls(obj)
             % switch from different methods
             if isempty(obj.options)
                 obj.options = nlsOption;
             end
             switch obj.options.nls_method
                 case {'Gauss-Newton'}
+                    tic
                     [xsol,flag,logg] = pcg_steihaug_gauss_newton(obj);
+                    t = toc;
                     logg = logg.iter_dataprocessing;
                 case {'Levenberg-Marquardt'}
                     preconditioned   = false;
+                    tic
                     [xsol,flag,logg] = pc_steihaug_levenberg_marquardt(obj,preconditioned);
+                    t = toc;
                     logg             = logg.iter_dataprocessing;
                 case {'preconditioned Levenberg-Marquardt'}
                     preconditioned   = true;
+                    tic
                     [xsol,flag,logg] = pc_steihaug_levenberg_marquardt(obj,preconditioned);
+                    t = toc;
                     logg = logg.iter_dataprocessing;                    
                 case {'Dogleg Gauss-Newton'}
+                    tic
                     [xsol,flag,logg] = doglet_gauss_newton(obj);
-                    logg = logg.iter_dataprocessing;         
+                    t = toc;
+                    logg = logg.iter_dataprocessing;        
+                case {'Steepest Descent'}
+                    [xsol,flag,logg] = steepest_descent(obj);
+            
+                case {'internal'}
+                    opt = optimoptions('lsqnonlin','SpecifyObjectiveGradient',true,'Display','off');
+                    [xsol,~,~,flag] = lsqnonlin(@(x)myfun(x,obj.r,obj.drdx), obj.x0, [],[],opt);
+                     logg            = nlsOption;
             end
-%                 case {'internal'}
-%                     [xsol,~,~,flag] = lsqnonlin(obj.r, obj.x0);
-%                     logg            = nan;
-%                 case {'class gauss-newton'}
-%                     [xsol,flag,logg] = basic_gauss_newton(obj);
-% %                     logg = logg.iter_dataprocessing;
-%                 case ('CG gauss-newton')
-%                     [xsol,flag,logg] = cg_gauss_newton(obj);
-% %                     logg = logg.iter_dataprocessing;  
-%                 case ('PCG gauss-newton')
-%                     [xsol,flag,logg] = pcg_gauss_newton(obj);
-% %                     logg = logg.iter_dataprocessing;   
-%                 case ('CG-Steihaug gauss-newton')
-%                     [xsol,flag,logg] = cg_steihaug_gauss_newton(obj);
-% %                     logg = logg.iter_dataprocessing;
-%                 case ('PCG-Steihaug gauss-newton')
-%                     [xsol,flag,logg] = pcg_steihaug_gauss_newton(obj);
-% %                     logg = logg.iter_dataprocessing;
-%                             
         end      
         % check the dimension of lower and upper bounds
         function bool = check_bound_dim(obj)
@@ -88,5 +84,9 @@ classdef nlsProblem
     end
 end
 
-% function [f,df]
-
+function [F,J] = myfun(x,r,dr)
+F = r(x);     % Objective function values at x
+if nargout > 1   % Two output arguments
+   J = dr(x);   % Jacobian of the function evaluated at x
+end
+end

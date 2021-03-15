@@ -58,7 +58,10 @@ function [xsol, flag, logg] = pcg_steihaug_gauss_newton(problem)
     
     % initial preconditioning
     if precondition
-        options.diagcomp = 10^-6;
+        options.diagcomp = 1;
+        options.type     = 'ict';
+        options.droptol  = 1e-2;
+%         options.michol   = 'on';   
     end
     
     % initial trust region - typical choices described by "Trust Region Methods"
@@ -153,7 +156,7 @@ if nargin < 4 || isempty(maxit), maxit = min(20,length(b)); end
 % intial
 x = zeros(size(b));
 r = -b;
-if ~isempty(C_T)
+if  ~isempty(C_T)
     % preconditioning activated
     y = C_T'\(C_T\r);
     p = - y;
@@ -184,7 +187,7 @@ while max(abs(r))>eps &&  i<=maxit
     r   = r + rho*Ap;       % update residual
     if ~isempty(C_T)
         % preconditioning activated
-        y   = C_T'\(C_T\r);
+        y = C_T'\(C_T\r);
         rr_new = r'*y;
     else
         % without preconditioning

@@ -58,7 +58,7 @@ ylim(plot_y_limit(logg.fval))
 grid on 
 
 subplot(3,2,3)
-logg.grad_norm(logg.grad_norm==0) = eps;
+logg.grad_norm(logg.grad_norm==0) =nan;
 semilogy(logg.iter, logg.grad_norm, '^-')
 xlabel('$\mathrm{Iteration}$','fontsize',12,'interpreter','latex')
 ylabel('$||\nabla f(x_k)||_2$','fontsize',12,'interpreter','latex')
@@ -68,7 +68,7 @@ ylim(plot_y_limit(logg.grad_norm))
 grid on 
 
 subplot(3,2,4)
-logg.dfval(logg.dfval==0) = eps;
+logg.dfval(logg.dfval==0) =nan;
 semilogy(logg.iter, logg.dfval, '^-')
 xlabel('$\mathrm{Iteration}$','fontsize',12,'interpreter','latex')
 ylabel('$f(x_k)-f(x_k+p_k)$','fontsize',12,'interpreter','latex')
@@ -87,7 +87,7 @@ ylim(plot_y_limit(logg.delta))
 grid on 
 
 subplot(3,2,6)
-logg.pk_norm(logg.pk_norm==0) = eps;
+logg.pk_norm(logg.pk_norm==0) = nan;
 semilogy(logg.iter, logg.pk_norm, '^-')
 xlabel('$\mathrm{Iteration}$','fontsize',12,'interpreter','latex')
 ylabel('$||p_k||_2$','fontsize',12,'interpreter','latex')

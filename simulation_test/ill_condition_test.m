@@ -5,7 +5,7 @@ addpath(genpath('../data/'));
 addpath(genpath('../class_def/'));
 addpath(genpath('../nls_solvers/'));
 %%
-n =;
+n =10;
 cond_A = zeros(n,1);
 e_inv = zeros(n,1);
 t_inv = zeros(n,1);
@@ -23,8 +23,11 @@ t_pcg = zeros(n,1);
 
 i_pcg = zeros(n,1);
 N     = zeros(n,1);
-options.diagcomp = 10^-6;
-
+options.diagcomp = 0.1;
+options.type = 'ict';
+options.droptol = 1e-2;
+options.michol   = 'on';
+tol   = 10^-5;
 for i = 1:n
     % create problem
     N(i)             = 2^i;
@@ -42,11 +45,11 @@ for i = 1:n
     t_pinv(i)        = toc;
     e_pinv(i)        = norm(xref - x,inf);
     % cg
-%     tic
-%     [x_cg,i_cg(i)]   = pcg_steihaug(A,b,[],N(i),[]);
-%     t_cg(i)          = toc;
-%     e_cg(i)          = norm(xref - x_cg,inf);
-%     
+    tic
+    [x_cg,i_cg(i)]   = pcg_steihaug(A,b,[],N(i),[]);
+    t_cg(i)          = toc;
+    e_cg(i)          = norm(xref - x_cg,inf);
+    
     
     
     % pcg
@@ -57,18 +60,22 @@ for i = 1:n
     t_pcg(i)         = toc;
     e_pcg(i)         = norm(xref - x_pcg,inf);
     % pcg-2
-    dk                = diag(ichol(A,options));
-    dk(dk==0)        = 1e-5;
-    Dk               = diag(dk);
-    [x_cg,i_cg(i)] = pcg_steihaug(A,b,[],N(i),Dk);    
-    t_cg(i)         = toc;
-    e_cg(i)         = norm(xref - x_cg,inf);
+%     dk                = diag(ichol(A));
+%     dk(dk==0)        = 1e-5;
+%     Dk               = diag(dk);
+%     [x_cg,i_cg(i)] = pcg_steihaug(A,b,[],N(i),Dk);    
+%     t_cg(i)         = toc;
+%     e_cg(i)         = norm(xref - x_cg,inf);
+
+% pcg-3
+%     [x_cg,i_cg(i)]   =  pcg(A,b,tol,N(i),C_T);
+%     t_cg(i)          = toc;
+%     e_cg(i)          = norm(xref - x_cg,inf);
    
     
 end
 %%
 plot_ill_condition_result(t_inv,t_pinv,t_pcg,t_cg, e_inv,e_pinv,e_cg,e_pcg,i_cg,i_pcg,N,cond_A)
-
 
 function plot_ill_condition_result(t_inv,t_pinv,t_pcg,t_cg,e_inv,e_pinv,e_cg,e_pcg,i_cg,i_pcg,N,cond_A)
 
@@ -114,7 +121,7 @@ end
 function [x,i] = pcg_steihaug(A,b,toltol,maxit,C_T)
 % lin
 % check alg options
-if nargin < 3 || isempty(toltol), toltol = 1e-10; end
+if nargin < 3 || isempty(toltol), toltol = 1e-12; end
 if nargin < 4 || isempty(maxit), maxit = min(20,length(b)); end
 % if nargin <5 || isempty(delta), delta = 1; end
 % intial
@@ -162,4 +169,14 @@ while (max(abs(r))>eps) &&  i<=maxit
     Ap  = A*p;
     i   = i+1;
 end
+end
+
+
+function [A,b,xref] = ill_conditioned_example(n)
+    % create a symmetric ill-conditioned matrix H
+    A    = hilb(n);
+%     A    = A'*A;
+    sigma = 3;
+    xref = randn(n,1);
+    b    = A*xref;
 end

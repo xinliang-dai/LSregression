@@ -3,7 +3,7 @@ classdef nlsOption
     %   Detailed explanation goes here
     
     properties
-        iter_max    int8   {mustBePositive} 
+        iter_max           {mustBePositive} 
         tol         double {mustBePositive} 
         cg_method   char 
         nls_method  char  
@@ -15,7 +15,7 @@ classdef nlsOption
             if nargin > 0 
                 obj.iter_max   = iter_max; 
             else
-                obj.iter_max   = 100;
+                obj.iter_max   = 200;
             end                
             if nargin > 1 
                 obj.tol        = tol;
